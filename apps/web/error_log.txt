@@ -1,0 +1,7 @@
+{
+  "booking": null,
+  "bookError": {
+    "name": "FunctionsHttpError",
+    "context": {}
+  }
+}
