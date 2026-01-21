@@ -1,177 +1,140 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { createClient } from "@supabase/supabase-js" // Client-side hydration
-import { createBrowserClient } from "@supabase/ssr"
-import { Reserva, Barberia, Servicio, Staff } from "@/types/db"
-import { checkInReservation } from "@/app/actions/booking-actions"
-import { Calendar, Clock, MapPin, CheckCircle, Navigation, AlertCircle } from "lucide-react"
-import Image from "next/image"
-import { motion } from "framer-motion"
-import { toast } from "sonner" // Assuming sonner is available, or alert
-
-// Types for joined data
-type BookingWithDetails = Reserva & {
-    barberia: Barberia
-    servicio: Servicio
-    staff: Staff
-}
+import { useState } from "react";
+import { Calendar, Clock, MapPin, MoreVertical, X, AlertCircle } from "lucide-react";
+import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function AppointmentsPage() {
-    const [bookings, setBookings] = useState<BookingWithDetails[]>([])
-    const [loading, setLoading] = useState(true)
-    const [activeTab, setActiveTab] = useState<'upcoming' | 'history'>('upcoming')
+    const [activeTab, setActiveTab] = useState<"upcoming" | "history">("upcoming");
 
-    // Client-side fetcher (Using supabase-js for easy relational query)
-    // In strict Next.js, this should be a Server Component fetching data, 
-    // but for Client Interactive Search/Filter, 'use client' is fine with useEffect.
-    useEffect(() => {
-        const fetchBookings = async () => {
-            const supabase = createBrowserClient(
-                process.env.NEXT_PUBLIC_SUPABASE_URL!,
-                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-            )
-            const { data: { user } } = await supabase.auth.getUser()
-
-            if (!user) return
-
-            const { data, error } = await supabase
-                .from('reservas')
-                .select(`
-                    *,
-                    barberia:barberias(*),
-                    servicio:servicios(*),
-                    staff:staff(*)
-                `)
-                .eq('cliente_id', user.id)
-                .order('start_time', { ascending: true })
-
-            if (!error && data) {
-                setBookings(data as any)
-            }
-            setLoading(false)
+    const upcomingAppointments = [
+        {
+            id: 1,
+            barber: "Wade Warren",
+            service: "Corte Clásico + Barba",
+            date: "Hoy, 20 Ene",
+            time: "16:00",
+            price: "45€",
+            status: "confirmed",
+            avatar: "W"
+        },
+        {
+            id: 2,
+            barber: "Jerome Bell",
+            service: "Afeitado Royal",
+            date: "Mañana, 21 Ene",
+            time: "10:30",
+            price: "20€",
+            status: "pending",
+            avatar: "J"
         }
-        fetchBookings()
-    }, [])
+    ];
 
-    const handleCheckIn = async (bookingId: string) => {
-        const result = await checkInReservation(bookingId)
-        if (result.success) {
-            // Optimistic update or refetch
-            setBookings(prev => prev.map(b =>
-                b.id === bookingId ? { ...b, status: 'checked_in' } : b
-            ))
-            alert("¡Llegaste! Tu estilista ha sido notificado.")
-        } else {
-            alert(result.error)
+    const pastAppointments = [
+        {
+            id: 3,
+            barber: "Wade Warren",
+            service: "Corte Clásico",
+            date: "10 Dic, 2025",
+            time: "15:00",
+            price: "25€",
+            status: "completed",
+            avatar: "W"
         }
-    }
+    ];
 
-    // Filter logic
-    const upcoming = bookings.filter(b => ['pending', 'confirmed', 'checked_in'].includes(b.status))
-    const history = bookings.filter(b => ['completed', 'cancelled', 'no_show'].includes(b.status))
-
-    const displayed = activeTab === 'upcoming' ? upcoming : history
+    const currentList = activeTab === "upcoming" ? upcomingAppointments : pastAppointments;
 
     return (
-        <div className="bg-gray-50 min-h-screen pb-24 px-6 pt-12">
-            <h1 className="text-3xl font-bold font-display text-gray-900 mb-6">Mis Citas</h1>
-
-            {/* Tabs */}
-            <div className="flex bg-gray-200 p-1 rounded-xl mb-6">
-                <button
-                    onClick={() => setActiveTab('upcoming')}
-                    className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${activeTab === 'upcoming' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500'}`}
-                >
-                    Próximas
-                </button>
-                <button
-                    onClick={() => setActiveTab('history')}
-                    className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${activeTab === 'history' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500'}`}
-                >
-                    Historial
-                </button>
+        <div className="min-h-screen bg-background pb-24">
+            {/* Header */}
+            <div className="px-6 pt-14 pb-4 sticky top-0 bg-background/95 backdrop-blur-md z-30 flex justify-between items-center">
+                <h1 className="text-2xl font-bold font-heading">Mis Citas</h1>
+                <div className="flex gap-2 bg-secondary p-1 rounded-full">
+                    <button
+                        onClick={() => setActiveTab("upcoming")}
+                        className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${activeTab === "upcoming" ? "bg-primary text-black shadow-md" : "text-muted-foreground hover:text-foreground"
+                            }`}
+                    >
+                        Próximas
+                    </button>
+                    <button
+                        onClick={() => setActiveTab("history")}
+                        className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${activeTab === "history" ? "bg-primary text-black shadow-md" : "text-muted-foreground hover:text-foreground"
+                            }`}
+                    >
+                        Historial
+                    </button>
+                </div>
             </div>
 
-            {/* List */}
-            {loading ? (
-                <div className="space-y-4">
-                    {[1, 2].map(i => <div key={i} className="h-40 bg-gray-200 rounded-2xl animate-pulse" />)}
-                </div>
-            ) : displayed.length === 0 ? (
-                <div className="text-center py-10 opacity-50">
-                    <Calendar size={48} className="mx-auto mb-4 text-gray-400" />
-                    <p className="font-medium">No tienes citas en esta sección.</p>
-                </div>
-            ) : (
-                <div className="space-y-4">
-                    {displayed.map(booking => {
-                        const start = new Date(booking.start_time)
-                        const isConfirmed = booking.status === 'confirmed'
-                        const isCheckedIn = booking.status === 'checked_in'
-
-                        return (
+            <div className="px-6 space-y-4 mt-2">
+                <AnimatePresence mode="popLayout">
+                    {currentList.length > 0 ? (
+                        currentList.map((app) => (
                             <motion.div
-                                key={booking.id}
+                                key={app.id}
                                 layout
-                                className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100"
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                className="bg-card rounded-3xl p-5 border border-white/5 relative overflow-hidden group"
                             >
-                                <div className="flex justify-between items-start mb-4">
-                                    <div className="flex gap-4">
-                                        <div className="w-12 h-12 bg-gray-100 rounded-xl overflow-hidden relative">
-                                            <Image src={booking.barberia?.banner_url || "/placeholder.jpg"} alt="Logo" fill className="object-cover" />
+                                {/* Status Stripe */}
+                                <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${app.status === 'confirmed' ? 'bg-primary' :
+                                        app.status === 'pending' ? 'bg-orange-400' : 'bg-green-500'
+                                    }`} />
+
+                                <div className="flex justify-between items-start mb-4 pl-3">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-sm font-bold text-foreground border border-white/10">
+                                            {app.avatar}
                                         </div>
                                         <div>
-                                            <h3 className="font-bold text-gray-900">{booking.servicio?.name}</h3>
-                                            <p className="text-xs text-gray-500">{booking.barberia?.name}</p>
+                                            <h3 className="font-bold text-foreground text-lg leading-none">{app.barber}</h3>
+                                            <p className="text-xs text-muted-foreground mt-1">{app.service}</p>
                                         </div>
                                     </div>
-                                    {/* Status Badge */}
-                                    <span className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${booking.status === 'confirmed' ? 'bg-green-100 text-green-700' :
-                                            booking.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                                                booking.status === 'checked_in' ? 'bg-blue-100 text-blue-700' :
-                                                    'bg-gray-100 text-gray-500'
-                                        }`}>
-                                        {booking.status.replace('_', ' ')}
-                                    </span>
-                                </div>
-
-                                <div className="flex gap-4 text-sm text-gray-600 mb-4 bg-gray-50 p-3 rounded-lg">
-                                    <div className="flex items-center gap-1.5">
-                                        <Calendar size={14} />
-                                        <span className="font-medium">{start.toLocaleDateString()}</span>
-                                    </div>
-                                    <div className="flex items-center gap-1.5">
-                                        <Clock size={14} />
-                                        <span className="font-medium">{start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                    <div className="px-2 py-1 rounded-md bg-white/5 text-[10px] font-bold uppercase tracking-wide text-foreground/80">
+                                        {app.price}
                                     </div>
                                 </div>
 
-                                {/* Actions */}
-                                {activeTab === 'upcoming' && (
-                                    <div className="grid grid-cols-2 gap-3">
-                                        {isConfirmed && (
-                                            <button
-                                                onClick={() => handleCheckIn(booking.id)}
-                                                className="col-span-2 py-3 bg-brand text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-all shadow-lg shadow-brand/20"
-                                            >
-                                                <Navigation size={18} />
-                                                ¡Llegué! (Check-in)
-                                            </button>
-                                        )}
-                                        {isCheckedIn && (
-                                            <div className="col-span-2 py-3 bg-blue-50 text-blue-700 font-bold rounded-xl flex items-center justify-center gap-2 border border-blue-100">
-                                                <CheckCircle size={18} />
-                                                En espera de atención
-                                            </div>
-                                        )}
+                                <div className="flex items-center gap-4 pl-3 text-sm font-medium text-foreground/90 bg-secondary/30 p-3 rounded-xl">
+                                    <div className="flex items-center gap-2">
+                                        <Calendar size={14} className="text-primary" />
+                                        {app.date}
+                                    </div>
+                                    <div className="w-[1px] h-3 bg-white/20" />
+                                    <div className="flex items-center gap-2">
+                                        <Clock size={14} className="text-primary" />
+                                        {app.time}
+                                    </div>
+                                </div>
+
+                                {activeTab === "upcoming" && (
+                                    <div className="flex gap-2 mt-4 pl-3">
+                                        <button className="flex-1 py-2.5 rounded-xl bg-primary text-black text-xs font-bold hover:bg-white transition-colors">
+                                            Reprogramar
+                                        </button>
+                                        <button className="px-4 py-2.5 rounded-xl bg-white/5 text-foreground hover:bg-red-500/20 hover:text-red-500 transition-colors">
+                                            <X size={16} />
+                                        </button>
                                     </div>
                                 )}
                             </motion.div>
-                        )
-                    })}
-                </div>
-            )}
+                        ))
+                    ) : (
+                        <div className="flex flex-col items-center justify-center py-20 text-center opacity-50">
+                            <div className="w-20 h-20 bg-secondary rounded-full flex items-center justify-center mb-4">
+                                <Calendar size={32} className="text-muted-foreground" />
+                            </div>
+                            <p className="font-bold text-lg">No tienes citas {activeTab === "upcoming" ? "próximas" : "pasadas"}</p>
+                            <p className="text-xs text-muted-foreground mt-2 max-w-[200px]">Explora barberías y reserva tu próximo estilo.</p>
+                        </div>
+                    )}
+                </AnimatePresence>
+            </div>
         </div>
-    )
+    );
 }
