@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createBrowserClient } from "@supabase/ssr";
 import { useRouter } from "next/navigation";
 import { User } from "@/types/db";
 
@@ -9,6 +9,7 @@ interface AuthContextType {
     user: User | null;
     loading: boolean;
     signInWithEmail: (email: string) => Promise<void>;
+    signIn: (role: string) => Promise<void>;
     signOut: () => Promise<void>;
 }
 
@@ -16,6 +17,7 @@ const AuthContext = createContext<AuthContextType>({
     user: null,
     loading: true,
     signInWithEmail: async () => { },
+    signIn: async () => { },
     signOut: async () => { },
 });
 
@@ -25,7 +27,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
-    const supabase = createClientComponentClient();
+    const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
 
     useEffect(() => {
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -81,13 +86,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         */
     };
 
+    const signIn = async (role: string) => {
+        // Mock Login for Dev/Auditor
+        setUser({
+            id: 'mock-user-id-' + role,
+            email: `mock-${role}@stylernow.com`,
+            role: role as any,
+            created_at: new Date().toISOString()
+        });
+        router.push(role === 'cliente' ? '/client/home' : role === 'barberia' ? '/business/dashboard' : '/backoffice/master');
+    };
+
     const signOut = async () => {
         await supabase.auth.signOut();
         router.push("/login");
     };
 
     return (
-        <AuthContext.Provider value={{ user, loading, signInWithEmail, signOut }}>
+        <AuthContext.Provider value={{ user, loading, signInWithEmail, signIn, signOut }}>
             {children}
         </AuthContext.Provider>
     );

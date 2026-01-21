@@ -9,7 +9,7 @@ const CHECKIN_WINDOW_START_MIN = -15 // 15 min before
 const CHECKIN_WINDOW_END_MIN = 10    // 10 min after
 
 export async function checkInReservation(bookingId: string) {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -21,7 +21,7 @@ export async function checkInReservation(bookingId: string) {
                 setAll(cookiesToSet) {
                     try {
                         cookiesToSet.forEach(({ name, value, options }) =>
-                            cookieStore.set(name, value, options)
+                            (cookieStore as any).set(name, value, options)
                         )
                     } catch {
                         // Server Action called from Client Component, ignored

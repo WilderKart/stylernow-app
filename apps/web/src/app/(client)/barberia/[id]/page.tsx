@@ -29,7 +29,7 @@ export default function BarberiaDetailPage() {
                 getStaffByBarberia(id),
                 getServiciosByBarberia(id)
             ]);
-            setBarberia(b);
+            setBarberia(b || undefined);
             setStaff(s);
             setServicios(sv);
             setLoading(false);

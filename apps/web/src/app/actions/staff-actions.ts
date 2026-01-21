@@ -5,7 +5,7 @@ import { cookies } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 
 export async function getStaffAgenda() {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -17,7 +17,7 @@ export async function getStaffAgenda() {
                 setAll(cookiesToSet) {
                     try {
                         cookiesToSet.forEach(({ name, value, options }) =>
-                            cookieStore.set(name, value, options)
+                            (cookieStore as any).set(name, value, options)
                         )
                     } catch {
                         // Server Action called from Client Component
@@ -61,7 +61,7 @@ export async function getStaffAgenda() {
 }
 
 export async function completeReservation(bookingId: string) {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -73,7 +73,7 @@ export async function completeReservation(bookingId: string) {
                 setAll(cookiesToSet) {
                     try {
                         cookiesToSet.forEach(({ name, value, options }) =>
-                            cookieStore.set(name, value, options)
+                            (cookieStore as any).set(name, value, options)
                         )
                     } catch { }
                 },

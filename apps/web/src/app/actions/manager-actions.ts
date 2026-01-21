@@ -19,7 +19,7 @@ export type StaffStatus = {
 }
 
 export async function getSedeDashboard() {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -68,7 +68,10 @@ export async function getSedeDashboard() {
     // A. Sales (Completed only)
     const todaySales = todayBookings
         .filter(b => b.status === 'completed')
-        .reduce((sum, b) => sum + (b.servicio?.price || 0), 0)
+        .reduce((sum, b) => {
+            const s = Array.isArray(b.servicio) ? b.servicio[0] : b.servicio;
+            return sum + (s?.price || 0);
+        }, 0)
 
     // B. Clients On Site (checked_in)
     const clientsOnSite = todayBookings.filter(b => b.status === 'checked_in').length
@@ -97,7 +100,8 @@ export async function getSedeDashboard() {
             // If confirmed, check time window
             if (b.status === 'confirmed') {
                 const start = new Date(b.start_time)
-                const end = new Date(start.getTime() + (b.servicio?.duration_minutes || 30) * 60000)
+                const s = Array.isArray(b.servicio) ? b.servicio[0] : b.servicio;
+                const end = new Date(start.getTime() + (s?.duration_minutes || 30) * 60000)
                 return now >= start && now <= end
             }
             return false

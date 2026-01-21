@@ -46,7 +46,7 @@ export default function AdminDashboardPage() {
                     <div>
                         <p className="text-xs text-gray-400 font-medium uppercase">Ingresos Mes</p>
                         <p className="text-lg font-bold text-gray-900 leading-tight">
-                            ${loading ? '...' : (kpis?.monthly_revenue / 1000000).toFixed(1)}M
+                            ${loading ? '...' : ((kpis?.monthly_revenue || 0) / 1000000).toFixed(1)}M
                         </p>
                     </div>
                 </div>
