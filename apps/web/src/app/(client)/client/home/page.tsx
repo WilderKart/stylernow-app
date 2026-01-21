@@ -1,169 +1,119 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { getBarberias } from "@/lib/api";
-import { Barberia } from "@/types/db";
-import { Search, MapPin, Star, Scissors, Sparkles, Navigation } from "lucide-react";
+import { useState } from "react";
+import { Search, MapPin, Bell, Star, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
 export default function ClientHomePage() {
-    const [barberias, setBarberias] = useState<Barberia[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [activeCategory, setActiveCategory] = useState("Todos");
+    const [activeCategory, setActiveCategory] = useState("Corte");
 
-    // Mock Categories
     const categories = [
-        { name: "Todos", icon: null },
-        { name: "Corte", icon: <Scissors size={14} /> },
-        { name: "Barba", icon: <Star size={14} /> },
-        { name: "Spa", icon: <Sparkles size={14} /> },
-        { name: "Color", icon: <Sparkles size={14} /> },
+        { name: "Corte", id: "corte" },
+        { name: "Barba", id: "barba" },
+        { name: "Tinte", id: "tinte" },
+        { name: "Afeitado", id: "afeitado" },
     ];
 
-    useEffect(() => {
-        getBarberias().then((data) => {
-            setBarberias(data);
-            setLoading(false);
-        });
-    }, []);
+    const specialists = [
+        { id: 1, name: "Wade Warren", rating: 5.0, image: "/images/barber1.jpg" },
+        { id: 2, name: "Darrell Steward", rating: 4.8, image: "/images/barber2.jpg" },
+        { id: 3, name: "Jerome Bell", rating: 4.9, image: "/images/barber3.jpg" },
+    ];
 
     return (
-        <div className="min-h-full pb-24 bg-gray-50">
-            {/* Header & Search */}
-            <header className="px-6 pt-12 pb-6 bg-white rounded-b-3xl shadow-sm sticky top-0 z-20">
+        <div className="min-h-full pb-32 bg-background text-foreground">
+            {/* Header */}
+            <header className="px-6 pt-14 pb-4 sticky top-0 z-30 bg-background/95 backdrop-blur-md">
                 <div className="flex justify-between items-center mb-6">
                     <div>
-                        <p className="text-gray-400 text-xs font-bold uppercase tracking-wider">Ubicación Actual</p>
-                        <div className="flex items-center gap-1 text-gray-900 font-bold text-lg">
-                            <MapPin size={18} className="text-brand-orange" />
-                            Bogotá, Chicó
+                        <h1 className="text-2xl font-bold font-heading">Hola, Alex!</h1>
+                        <div className="flex items-center gap-1 text-muted-foreground text-sm">
+                            <MapPin size={14} className="text-primary" />
+                            <p>Stylernow - Madrid</p>
                         </div>
                     </div>
-                    <div className="w-10 h-10 bg-gray-100 rounded-full overflow-hidden border-2 border-white shadow-sm">
-                        {/* Placeholder Avatar */}
-                        <div className="w-full h-full bg-slate-300 flex items-center justify-center text-xs font-bold text-slate-500">YO</div>
-                    </div>
-                </div>
-
-                <div className="relative shadow-sm rounded-2xl">
-                    <Search className="absolute left-4 top-3.5 text-gray-400" size={20} />
-                    <input
-                        type="text"
-                        placeholder="Busca barberías o servicios..."
-                        className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-2xl text-sm font-medium focus:ring-2 focus:ring-brand-orange/20 transition-all placeholder:text-gray-400"
-                    />
+                    <button className="w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center text-foreground hover:bg-secondary transition-colors">
+                        {/* Edit Icon as per image or Bell */}
+                        <div className="w-full h-full rounded-full bg-slate-200 relative overflow-hidden">
+                            {/* Placeholder Avatar */}
+                            <div className="absolute inset-0 bg-secondary flex items-center justify-center text-xs">YO</div>
+                        </div>
+                    </button>
                 </div>
             </header>
 
-            {/* Categories Scroll */}
-            <div className="mt-6 px-6 overflow-x-auto no-scrollbar pb-2">
-                <div className="flex gap-3">
-                    {categories.map((cat) => (
-                        <button
-                            key={cat.name}
-                            onClick={() => setActiveCategory(cat.name)}
-                            className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-all ${activeCategory === cat.name
-                                    ? "bg-gray-900 text-white shadow-lg"
-                                    : "bg-white text-gray-500 border border-gray-100 shadow-sm"
-                                }`}
-                        >
-                            {cat.icon}
-                            {cat.name}
+            <div className="px-6 space-y-8">
+                {/* Hero / Premium Pack Card */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="w-full h-48 rounded-[2rem] bg-gradient-to-br from-[#e0e0e0] to-[#a0a0a0] p-6 relative overflow-hidden shadow-lg"
+                >
+                    {/* Metallic/Silver Gradient Card logic */}
+                    <div className="absolute top-0 right-0 p-6">
+                        <span className="text-xl font-bold text-black/80">35€</span>
+                    </div>
+
+                    <div className="h-full flex flex-col justify-center text-black/80 z-10 relative">
+                        <h2 className="text-2xl font-bold mb-1">Pack Premium</h2>
+                        <p className="text-sm opacity-70 mb-4">Corte + Barba + Estilo<br />Exclusivo en App</p>
+
+                        <button className="w-fit px-6 py-2 bg-white/40 backdrop-blur-md rounded-full text-xs font-bold uppercase tracking-wider hover:bg-white/60 transition-colors">
+                            Reservar
                         </button>
-                    ))}
-                </div>
-            </div>
+                    </div>
 
-            {/* Near Me Section (Carrousel) */}
-            <div className="mt-8 px-6">
-                <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-lg font-bold text-gray-900">Cerca de mí</h2>
-                    <button className="text-brand-orange text-xs font-bold flex items-center gap-1 bg-orange-50 px-2 py-1 rounded-lg">
-                        <Navigation size={12} /> Mapa
-                    </button>
+                    {/* Background shine effect */}
+                    <div className="absolute -right-10 -bottom-20 w-48 h-48 bg-white/20 blur-3xl rounded-full pointer-events-none" />
+                </motion.div>
+
+                {/* Services */}
+                <div>
+                    <h3 className="text-lg font-bold mb-4">Servicios</h3>
+                    <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+                        {categories.map((cat) => (
+                            <button
+                                key={cat.id}
+                                onClick={() => setActiveCategory(cat.name)}
+                                className={`px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 ${activeCategory === cat.name
+                                        ? "bg-black text-white border border-transparent" // Active: Black button as per image
+                                        : "bg-card text-muted-foreground border border-transparent hover:bg-secondary"
+                                    }`}
+                            >
+                                {cat.name}
+                            </button>
+                        ))}
+                    </div>
                 </div>
 
-                {/* Horizontal Scroll for Recommended */}
-                <div className="flex gap-4 overflow-x-auto no-scrollbar pb-4 -mx-6 px-6">
-                    {loading ? (
-                        [1, 2, 3].map(i => <div key={i} className="min-w-[280px] h-48 bg-gray-200 rounded-2xl animate-pulse" />)
-                    ) : (
-                        barberias.slice(0, 3).map((barberia) => (
-                            <Link key={barberia.id} href={`/barberia/${barberia.id}`} className="block">
-                                <div className="min-w-[280px] bg-white rounded-2xl shadow-ios overflow-hidden relative group">
-                                    <div className="h-32 w-full relative">
-                                        <Image
-                                            src={barberia.banner_url || "/placeholder.jpg"}
-                                            alt={barberia.name}
-                                            fill
-                                            className="object-cover group-hover:scale-105 transition-transform duration-500"
-                                        />
-                                        <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-2 py-1 rounded-lg text-[10px] font-bold text-white flex items-center gap-1">
-                                            <Star size={10} className="text-yellow-400 fill-yellow-400" /> 4.9
+                {/* Especialistas */}
+                <div>
+                    <h3 className="text-lg font-bold mb-4">Especialistas</h3>
+                    <div className="flex gap-4 overflow-x-auto no-scrollbar pb-4">
+                        {specialists.map((specialist) => (
+                            <Link href={`/barber/${specialist.id}`} key={specialist.id}>
+                                <div className="w-40 h-56 rounded-3xl bg-card overflow-hidden relative group border border-border/50">
+                                    <div className="absolute inset-0 bg-secondary/50" /> {/* Image Placeholder */}
+                                    {/* Real image would go here with fill */}
+
+                                    <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/90 to-transparent pt-12">
+                                        <p className="text-white font-bold text-sm leading-tight mb-1">{specialist.name}</p>
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-1 text-[10px] text-yellow-400">
+                                                <Star size={10} fill="currentColor" />
+                                                <span>{specialist.rating}</span>
+                                            </div>
+                                            <div className="w-6 h-6 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                                                <ChevronRight size={14} className="text-white" />
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="p-4">
-                                        <h3 className="font-bold text-gray-900 truncate">{barberia.name}</h3>
-                                        <p className="text-xs text-gray-500 mt-0.5">A 1.2 km • Abierto ahora</p>
                                     </div>
                                 </div>
                             </Link>
-                        ))
-                    )}
-                </div>
-            </div>
-
-            {/* All Barberias (Vertical) */}
-            <div className="mt-6 px-6">
-                <h2 className="text-lg font-bold text-gray-900 mb-4">Recomendado para ti</h2>
-                <div className="grid gap-5">
-                    {loading ? (
-                        [1, 2].map(i => <div key={i} className="h-64 bg-gray-200 rounded-3xl animate-pulse" />)
-                    ) : (
-                        barberias.map((barberia) => (
-                            <Link key={barberia.id} href={`/barberia/${barberia.id}`}>
-                                <motion.div
-                                    whileTap={{ scale: 0.98 }}
-                                    className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden"
-                                >
-                                    <div className="relative h-44 w-full">
-                                        <Image
-                                            src={barberia.banner_url || "/placeholder.jpg"}
-                                            alt={barberia.name}
-                                            fill
-                                            className="object-cover"
-                                        />
-                                        <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent" />
-                                        <div className="absolute bottom-4 left-4 text-white">
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <span className="bg-brand-orange text-white text-[10px] font-bold px-2 py-0.5 rounded-md">PRO</span>
-                                                <span className="text-[10px] font-medium opacity-90">Barbería & Spa</span>
-                                            </div>
-                                            <h3 className="text-xl font-bold">{barberia.name}</h3>
-                                        </div>
-                                    </div>
-                                    <div className="p-5 flex justify-between items-center">
-                                        <div className="flex gap-3">
-                                            <div className="flex -space-x-2 overflow-hidden">
-                                                <div className="w-8 h-8 rounded-full bg-gray-200 border-2 border-white ring-1 ring-gray-100" />
-                                                <div className="w-8 h-8 rounded-full bg-gray-300 border-2 border-white ring-1 ring-gray-100" />
-                                                <div className="w-8 h-8 rounded-full bg-gray-400 border-2 border-white ring-1 ring-gray-100 flex items-center justify-center text-[10px] font-bold text-white">+3</div>
-                                            </div>
-                                            <div>
-                                                <p className="text-xs font-bold text-gray-400 uppercase">Expertos</p>
-                                                <p className="text-xs font-bold text-gray-900">5 disponibles hoy</p>
-                                            </div>
-                                        </div>
-                                        <button className="bg-gray-900 text-white rounded-xl px-5 py-2 text-sm font-bold shadow-lg shadow-gray-900/20">
-                                            Reservar
-                                        </button>
-                                    </div>
-                                </motion.div>
-                            </Link>
-                        ))
-                    )}
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>

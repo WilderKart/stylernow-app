@@ -27,7 +27,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="es" className={`${outfit.variable} ${inter.variable}`}>
-            <body className="font-sans antialiased text-secondary-foreground bg-app-bg">
+            <body className="font-sans antialiased text-foreground bg-background">
                 {children}
                 <Toaster position="top-center" richColors />
             </body>

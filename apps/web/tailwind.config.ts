@@ -2,32 +2,60 @@ import type { Config } from "tailwindcss";
 
 const config: Config = {
     content: [
-        "./app/**/*.{js,ts,jsx,tsx,mdx}",
-        "./components/**/*.{js,ts,jsx,tsx,mdx}",
+        "./src/app/**/*.{js,ts,jsx,tsx,mdx}", // Fixed path to include src
+        "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
         "../../packages/ui/**/*.{js,ts,jsx,tsx}"
     ],
     theme: {
         extend: {
             colors: {
+                border: "var(--border)",
+                input: "var(--input)",
+                ring: "var(--ring)",
+                background: "var(--background)",
+                foreground: "var(--foreground)",
+                primary: {
+                    DEFAULT: "var(--primary)",
+                    foreground: "var(--primary-foreground)",
+                },
+                secondary: {
+                    DEFAULT: "var(--secondary)",
+                    foreground: "var(--secondary-foreground)",
+                },
+                destructive: {
+                    DEFAULT: "var(--destructive)",
+                    foreground: "var(--destructive-foreground)",
+                },
+                muted: {
+                    DEFAULT: "var(--muted)",
+                    foreground: "var(--muted-foreground)",
+                },
+                accent: {
+                    DEFAULT: "var(--accent)",
+                    foreground: "var(--accent-foreground)",
+                },
+                popover: {
+                    DEFAULT: "var(--popover)",
+                    foreground: "var(--popover-foreground)",
+                },
+                card: {
+                    DEFAULT: "var(--card)",
+                    foreground: "var(--card-foreground)",
+                },
                 brand: {
-                    DEFAULT: "#F5A623", // Golden Orange from reference
+                    DEFAULT: "#F5A623", // Keep for legacy
                     dark: "#D08B1B",
-                    foreground: "#FFFFFF",
+                    foreground: "#000000",
                 },
-                dark: {
-                    DEFAULT: "#1A1A1A", // Dark card background
-                    surface: "#252525", // Lighter dark surface
-                },
-                app: {
-                    bg: "#F2F2F7", // iOS system gray background
-                }
             },
             fontFamily: {
                 sans: ["var(--font-outfit)", "sans-serif"],
+                heading: ["var(--font-outfit)", "sans-serif"],
             },
             borderRadius: {
-                '3xl': '1.5rem',
-                '4xl': '2rem', // Super rounded for modal-like cards
+                lg: "var(--radius)",
+                md: "calc(var(--radius) - 2px)",
+                sm: "calc(var(--radius) - 4px)",
             },
         },
     },

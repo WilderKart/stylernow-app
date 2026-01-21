@@ -3,32 +3,54 @@
 @tailwind utilities;
 
 :root {
-  --font-geist-sans: "Inter", sans-serif;
+  /* Dark Premium Palette */
+  --background: #09090b; /* Zinc 950 - Deep Black */
+  --foreground: #ffffff; /* Pure White */
+  
+  --card: #18181b; /* Zinc 900 */
+  --card-foreground: #ffffff;
+  
+  --popover: #18181b;
+  --popover-foreground: #ffffff;
+  
+  --primary: #FFD700; /* Gold */
+  --primary-foreground: #000000;
+  
+  --secondary: #27272a; /* Zinc 800 */
+  --secondary-foreground: #e4e4e7; /* Zinc 200 */
+  
+  --muted: #27272a;
+  --muted-foreground: #a1a1aa; /* Zinc 400 */
+  
+  --accent: #FFD700;
+  --accent-foreground: #000000;
+  
+  --destructive: #7f1d1d;
+  --destructive-foreground: #ffffff;
+  
+  --border: #27272a;
+  --input: #27272a;
+  --ring: #FFD700;
+  
+  --radius: 1rem;
 }
 
 html, body {
   height: 100%;
   width: 100%;
   overflow-x: hidden;
-  -webkit-tap-highlight-color: transparent;
-  background-color: #F5F5F7; /* iOS Gray base */
-  color: #1D1D1F;
-}
-
-/* Mobile-first PWA optimizers */
-body {
-  margin: 0;
-  padding: 0;
-  font-family: var(--font-geist-sans);
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-outfit), sans-serif;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom Scrollbar for desktop, hidden on mobile usually */
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-thumb {
-  background-color: rgba(0,0,0,0.2);
-  border-radius: 4px;
+  background-color: var(--secondary);
+  border-radius: 9999px;
 }
