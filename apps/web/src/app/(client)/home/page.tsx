@@ -7,6 +7,8 @@ import { Search, MapPin } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
+import { motion } from "framer-motion";
+
 export default function ClientHomePage() {
     const [barberias, setBarberias] = useState<Barberia[]>([]);
     const [loading, setLoading] = useState(true);
@@ -19,7 +21,12 @@ export default function ClientHomePage() {
     }, []);
 
     return (
-        <div className="min-h-full pb-6">
+        <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="min-h-full pb-6"
+        >
             {/* Header */}
             <header className="px-6 pt-12 pb-4 bg-white sticky top-0 z-10 shadow-sm">
                 <h1 className="text-3xl font-bold font-display text-gray-900">Explorar</h1>
@@ -37,7 +44,7 @@ export default function ClientHomePage() {
             <div className="px-6 mt-6 space-y-6">
                 <div className="flex justify-between items-center">
                     <h2 className="text-xl font-bold text-gray-900">Barberías Top</h2>
-                    <button className="text-brand font-semibold text-sm">Ver todo</button>
+                    <button className="text-brand font-semibold text-sm hover:opacity-80 active:scale-95 transition-all">Ver todo</button>
                 </div>
 
                 {loading ? (
@@ -78,6 +85,6 @@ export default function ClientHomePage() {
                     </div>
                 )}
             </div>
-        </div>
+        </motion.div>
     );
 }
