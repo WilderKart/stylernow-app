@@ -27,5 +27,3 @@ export async function getSuperUserKPIs(): Promise<SuperUserKPIs> {
     return MOCK_SUPERUSER_KPIS;
 }
 
-// Re-exporting all
-export { getBarberias, getBarberiaById, getStaffByBarberia, getServiciosByBarberia, createMockReserva, getReservationsByStaff, getStaffDailyEarnings, getAdminDashKPIs, getGlobalAgenda };
